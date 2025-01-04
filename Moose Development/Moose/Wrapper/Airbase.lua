@@ -791,6 +791,8 @@ AIRBASE.Sinai = {
 -- * AIRBASE.Kola.Vuojarvi
 -- * AIRBASE.Kola.Andoya
 -- * AIRBASE.Kola.Alakourtti
+-- * AIRBASE.Kola.Kittila
+-- * AIRBASE.Kola.Bardufoss
 --
 -- @field Kola
 AIRBASE.Kola = {
@@ -814,6 +816,8 @@ AIRBASE.Kola = {
   ["Vuojarvi"] = "Vuojarvi",
   ["Andoya"] = "Andoya",
   ["Alakourtti"] = "Alakourtti",
+  ["Kittila"] = "Kittila",
+  ["Bardufoss"] = "Bardufoss",
 }
 
 --- Airbases of the Afghanistan map
@@ -851,6 +855,39 @@ AIRBASE.Afghanistan = {
   ["Shindand"] = "Shindand",
   ["Shindand_Heliport"] = "Shindand Heliport",
   ["Tarinkot"] = "Tarinkot",
+}
+
+--- Airbases of the Iraq map
+--
+-- * AIRBASE.Iraq.Baghdad_International_Airport
+-- * AIRBASE.Iraq.Sulaimaniyah_International_Airport
+-- * AIRBASE.Iraq.Al_Sahra_Airport
+-- * AIRBASE.Iraq.Erbil_International_Airpor
+-- * AIRBASE.Iraq.Al_Taji_Airport
+-- * AIRBASE.Iraq.Al_Asad_Airbase
+-- * AIRBASE.Iraq.Al_Salam_Airbase
+-- * AIRBASE.Iraq.Balad_Airbase
+-- * AIRBASE.Iraq.Kirkuk_International_Airport
+-- * AIRBASE.Iraq.Bashur_Airport
+-- * AIRBASE.Iraq.Al_Taquddum_Airport
+-- * AIRBASE.Iraq.Qayyarah_Airfield_West
+-- * AIRBASE.Iraq.K1_Base
+--
+-- @field Iraq
+AIRBASE.Iraq = {
+  ["Baghdad_International_Airport"] = "Baghdad International Airport",
+  ["Sulaimaniyah_International_Airport"] = "Sulaimaniyah International Airport",
+  ["Al_Sahra_Airport"] = "Al-Sahra Airport",
+  ["Erbil_International_Airport"] = "Erbil International Airport",
+  ["Al_Taji_Airport"] = "Al-Taji Airport",
+  ["Al_Asad_Airbase"] = "Al-Asad Airbase",
+  ["Al_Salam_Airbase"] = "Al-Salam Airbase",
+  ["Balad_Airbase"] = "Balad Airbase",
+  ["Kirkuk_International_Airport"] = "Kirkuk International Airport",
+  ["Bashur_Airport"] = "Bashur Airport",
+  ["Al_Taquddum_Airport"] = "Al-Taquddum Airport",
+  ["Qayyarah_Airfield_West"] = "Qayyarah Airfield West",
+  ["K1_Base"] = "K1 Base",
 }
 
 --- AIRBASE.ParkingSpot ".Coordinate, ".TerminalID", ".TerminalType", ".TOAC", ".Free", ".TerminalID0", ".DistToRwy".
@@ -966,22 +1003,22 @@ function AIRBASE:Register(AirbaseName)
   --end
 
   -- Set category.
-  if self.category==Airbase.Category.AIRDROME then
-    self.isAirdrome=true
-  elseif self.category==Airbase.Category.HELIPAD then
+if self.category==Airbase.Category.AIRDROME then
+  self.isAirdrome=true
+elseif self.category==Airbase.Category.HELIPAD or self.descriptors.typeName=="FARP_SINGLE_01" then
+  self.isHelipad=true
+elseif self.category==Airbase.Category.SHIP then
+  self.isShip=true
+  -- DCS bug: Oil rigs and gas platforms have category=2 (ship). Also they cannot be retrieved by coalition.getStaticObjects()
+  if self.descriptors.typeName=="Oil rig" or self.descriptors.typeName=="Ga" then
     self.isHelipad=true
-  elseif self.category==Airbase.Category.SHIP then
-    self.isShip=true
-    -- DCS bug: Oil rigs and gas platforms have category=2 (ship). Also they cannot be retrieved by coalition.getStaticObjects()
-    if self.descriptors.typeName=="Oil rig" or self.descriptors.typeName=="Ga" then
-      self.isHelipad=true
-      self.isShip=false
-      self.category=Airbase.Category.HELIPAD
-      _DATABASE:AddStatic(AirbaseName)
-    end
-  else
-    self:E("ERROR: Unknown airbase category!")
+    self.isShip=false
+    self.category=Airbase.Category.HELIPAD
+    _DATABASE:AddStatic(AirbaseName)
   end
+else
+  self:E("ERROR: Unknown airbase category!")
+end
 
   -- Init Runways.
   self:_InitRunways()

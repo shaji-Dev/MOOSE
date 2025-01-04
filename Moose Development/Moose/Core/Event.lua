@@ -1329,6 +1329,7 @@ function EVENT:onEvent( Event )
           end
           
           Event.IniDCSGroupName = Event.IniUnit and Event.IniUnit.GroupName or ""
+          Event.IniGroupName=Event.IniDCSGroupName --At least set the group name because group might not exist any more
           if Event.IniDCSGroup and Event.IniDCSGroup:isExist() then
             Event.IniDCSGroupName = Event.IniDCSGroup:getName()
             Event.IniGroup = GROUP:FindByName( Event.IniDCSGroupName )
@@ -1473,12 +1474,13 @@ function EVENT:onEvent( Event )
           -- SCENERY
           ---
           Event.TgtDCSUnit = Event.target
-          Event.TgtDCSUnitName = Event.TgtDCSUnit:getName()
-          if Event.TgtDCSUnitName==nil then return end
-          Event.TgtUnitName = Event.TgtDCSUnitName
-          Event.TgtUnit = SCENERY:Register( Event.TgtDCSUnitName, Event.target )
-          Event.TgtCategory = Event.TgtDCSUnit:getDesc().category
-          Event.TgtTypeName = Event.TgtDCSUnit:getTypeName()
+          Event.TgtDCSUnitName = Event.TgtDCSUnit.getName and Event.TgtDCSUnit.getName() or nil
+          if Event.TgtDCSUnitName~=nil then
+            Event.TgtUnitName = Event.TgtDCSUnitName
+            Event.TgtUnit = SCENERY:Register( Event.TgtDCSUnitName, Event.target )
+            Event.TgtCategory = Event.TgtDCSUnit:getDesc().category
+            Event.TgtTypeName = Event.TgtDCSUnit:getTypeName()
+          end
         end
       end
 
